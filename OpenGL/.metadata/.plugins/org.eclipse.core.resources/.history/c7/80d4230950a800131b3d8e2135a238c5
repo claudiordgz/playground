@@ -1,0 +1,110 @@
+/*
+ * opengl_methods.cpp
+ *
+ *  Created on: Mar 10, 2014
+ *      Author: claudiordgz
+ */
+
+void get_shader(char *dir, const char *file_name,
+                std::string const& open_gl_ver, std::string &returnVal)
+{
+  std::string file_str(dir);
+  file_str.append(file_name);
+  DEBUG(file_str);
+  returnVal.assign(open_gl_ver.begin(), open_gl_ver.end());
+  read_file(file_str.c_str(), returnVal);
+  DEBUG(returnVal);
+}
+
+int init(char *dir)
+{
+  GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
+  GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+  {
+    std::string vs_source;
+    get_shader(dir, "triangles.vert", open_gl_version, vs_source);
+    const char * c_source = vs_source.c_str();
+    glShaderSource(vs, 1, &c_source, NULL);
+  }
+  glCompileShader(vs);
+  glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
+  if (0 == compile_ok)
+  {
+    std::cerr << "Error in vertex shader\n";
+    return (0);
+  }
+  GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+  {
+    std::string fs_source;
+    get_shader(dir, "triangles.frag", open_gl_version, fs_source);
+    const char * c_source = fs_source.c_str();
+    glShaderSource(fs, 1, &c_source, NULL);
+  }
+  glCompileShader(fs);
+  glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
+  if (!compile_ok)
+  {
+    std::cerr << "Error in fragment shader\n";
+    return (0);
+  }
+  program = glCreateProgram();
+  glAttachShader(program, vs);
+  glAttachShader(program, fs);
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
+  if (!link_ok)
+  {
+    std::cerr << "glLinkProgram:";
+    return (0);
+  }
+
+  const char* attribute_name = "coord2d";
+  attribute_coord2d = glGetAttribLocation(program, attribute_name);
+  if (attribute_coord2d == -1)
+  {
+    std::cerr << "Could not bind attribute " << attribute_name << std::endl;
+    return (0);
+  }
+
+  return (1);
+}
+
+
+void display(void)
+{
+  /* Clear the background as white */
+  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glUseProgram(program);
+  glEnableVertexAttribArray(attribute_coord2d);
+  GLfloat triangle_vertices[] = {
+     0.0,  0.8,
+    -0.8, -0.8,
+     0.8, -0.8,
+  };
+  /* Describe our vertices array to OpenGL (it can't guess its format automatically) */
+  glVertexAttribPointer(
+    attribute_coord2d, // attribute
+    2,                 // number of elements per vertex, here (x,y)
+    GL_FLOAT,          // the type of each element
+    GL_FALSE,          // take our values as-is
+    0,                 // no extra data between each position
+    triangle_vertices  // pointer to the C array
+  );
+
+  /* Push each element in buffer_vertices to the vertex shader */
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDisableVertexAttribArray(attribute_coord2d);
+
+  /* Display the result */
+  glutSwapBuffers();
+}
+
+void free_resources()
+{
+  glDeleteProgram(program);
+}
+
+
+

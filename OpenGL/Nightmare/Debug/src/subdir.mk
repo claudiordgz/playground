@@ -5,15 +5,18 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/LoadShaders.cpp \
-../src/Nightmare.cpp 
+../src/Nightmare.cpp \
+../src/opengl_methods.cpp 
 
 OBJS += \
 ./src/LoadShaders.o \
-./src/Nightmare.o 
+./src/Nightmare.o \
+./src/opengl_methods.o 
 
 CPP_DEPS += \
 ./src/LoadShaders.d \
-./src/Nightmare.d 
+./src/Nightmare.d \
+./src/opengl_methods.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
