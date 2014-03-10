@@ -1,0 +1,181 @@
+
+#include "vgl.h"
+#include "LoadShaders.h"
+
+#include <GL/glew.h>
+
+#include <string>
+#include <iostream>
+#include <fstream>
+
+#define debugging_enabled true
+#define DEBUG(x) do { \
+  if (debugging_enabled) { std::cerr << x << std::endl; } \
+} while (0)
+
+#ifdef GL_ES_VERSION_2_0
+  const std::string open_gl_version = "#version 100\n";  // OpenGL ES 2.0
+#else
+  const std::string open_gl_version = "#version 120\n";  // OpenGL 2.1
+#endif
+
+GLuint program;
+GLint attribute_coord2d;
+
+template<class T>
+void read_file(T const &filename, std::string &content);
+
+int init(char *dir);
+void display(void);
+void free_resources();
+
+//Main program
+int main(int argc, char **argv)
+{
+  glutInit(&argc, argv);
+  if(argc != 2)
+  {
+    std::cerr << "No resource folder defined in CMD Arguments" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+
+  glutInitWindowPosition(10, 10);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA );
+  glutInitWindowSize(512, 512);
+  glutInitContextVersion(2, 1);
+  glutInitContextProfile(GLUT_CORE_PROFILE);
+  glewExperimental = GL_TRUE;
+  std::string testing = "testing";
+  glutCreateWindow(testing.c_str());
+
+  GLenum glew_status = glewInit();
+  if(glew_status != GLEW_OK)
+  {
+    std::cerr << "Unable to initialize GLEW... exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  std::cout << glGetString( GL_VERSION ) << std::endl;
+
+  if(1 == init(argv[argc-1]))
+  {
+    /* We can display it if everything goes OK */
+    glutDisplayFunc(display);
+    glutMainLoop();
+  }
+
+  /* If the program exits in the usual way,
+  free resources and exit with a success */
+  free_resources();
+
+  return (EXIT_SUCCESS);
+}
+
+template<class T>
+void read_file(T const &filename, std::string &content)
+{
+  std::ifstream ifs(filename);
+  content.append((std::istreambuf_iterator<char>(ifs)),
+                 (std::istreambuf_iterator<char>()));
+}
+
+int init(char *dir)
+{
+  GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
+  GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+  std::string file_;
+  file_.assign(dir);
+  {
+    std::string file_str(file_);
+    file_str.append("triangles.vert");
+    DEBUG(file_str);
+    std::string vs_source(open_gl_version.begin(), open_gl_version.end());
+    read_file(file_str.c_str(), vs_source);
+    DEBUG(vs_source);
+    const char * c_source = vs_source.c_str();
+    glShaderSource(vs, 1, &c_source, NULL);
+  }
+  glCompileShader(vs);
+  glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
+  if (0 == compile_ok)
+  {
+    std::cerr << "Error in vertex shader\n";
+    return (0);
+  }
+  GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+  {
+    std::string file_str(file_);
+    file_str.append("triangles.frag");
+    DEBUG(file_str);
+    std::string fs_source(open_gl_version.begin(), open_gl_version.end());
+    read_file(file_str.c_str(), fs_source);
+    DEBUG(fs_source);
+    const char * c_source = fs_source.c_str();
+    glShaderSource(fs, 1, &c_source, NULL);
+  }
+  glCompileShader(fs);
+  glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
+  if (!compile_ok)
+  {
+    std::cerr << "Error in fragment shader\n";
+    return (0);
+  }
+  program = glCreateProgram();
+  glAttachShader(program, vs);
+  glAttachShader(program, fs);
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
+  if (!link_ok)
+  {
+    std::cerr << "glLinkProgram:";
+    return (0);
+  }
+
+  const char* attribute_name = "coord2d";
+  attribute_coord2d = glGetAttribLocation(program, attribute_name);
+  if (attribute_coord2d == -1)
+  {
+    std::cerr << "Could not bind attribute " << attribute_name << std::endl;
+    return (0);
+  }
+
+  return (1);
+
+}
+
+
+void display(void)
+{
+  /* Clear the background as white */
+  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glUseProgram(program);
+  glEnableVertexAttribArray(attribute_coord2d);
+  GLfloat triangle_vertices[] = {
+     0.0,  0.8,
+    -0.8, -0.8,
+     0.8, -0.8,
+  };
+  /* Describe our vertices array to OpenGL (it can't guess its format automatically) */
+  glVertexAttribPointer(
+    attribute_coord2d, // attribute
+    2,                 // number of elements per vertex, here (x,y)
+    GL_FLOAT,          // the type of each element
+    GL_FALSE,          // take our values as-is
+    0,                 // no extra data between each position
+    triangle_vertices  // pointer to the C array
+  );
+
+  /* Push each element in buffer_vertices to the vertex shader */
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDisableVertexAttribArray(attribute_coord2d);
+
+  /* Display the result */
+  glutSwapBuffers();
+}
+
+void free_resources()
+{
+  glDeleteProgram(program);
+}

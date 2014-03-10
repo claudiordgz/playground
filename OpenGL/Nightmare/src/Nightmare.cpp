@@ -1,14 +1,34 @@
 
-#include <iostream>
 #include "vgl.h"
 #include "LoadShaders.h"
-#include <string>
+
 #include <GL/glew.h>
+
+#include <string>
+#include <iostream>
+#include <fstream>
+
+/*
+ *  Template includes after
+ *  our regular libraries
+ */
+#include "file_operations.hpp"
+
+#define debugging_enabled true
+#define DEBUG(x) do { \
+  if (debugging_enabled) { std::cerr << x << std::endl; } \
+} while (0)
+
+#ifdef GL_ES_VERSION_2_0
+  const std::string open_gl_version = "#version 100\n";  // OpenGL ES 2.0
+#else
+  const std::string open_gl_version = "#version 120\n";  // OpenGL 2.1
+#endif
 
 GLuint program;
 GLint attribute_coord2d;
 
-int init(void);
+int init(char *dir);
 void display(void);
 void free_resources();
 
@@ -16,6 +36,13 @@ void free_resources();
 int main(int argc, char **argv)
 {
   glutInit(&argc, argv);
+  if(argc != 2)
+  {
+    std::cerr << "No resource folder defined in CMD Arguments" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+
   glutInitWindowPosition(10, 10);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA );
   glutInitWindowSize(512, 512);
@@ -33,7 +60,7 @@ int main(int argc, char **argv)
   }
   std::cout << glGetString( GL_VERSION ) << std::endl;
 
-  if(1 == init())
+  if(1 == init(argv[argc-1]))
   {
     /* We can display it if everything goes OK */
     glutDisplayFunc(display);
@@ -47,22 +74,22 @@ int main(int argc, char **argv)
   return (EXIT_SUCCESS);
 }
 
-int init(void)
+int init(char *dir)
 {
   GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
-
   GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-  const char *vs_source =
-#ifdef GL_ES_VERSION_2_0
-    "#version 100\n"  // OpenGL ES 2.0
-#else
-    "#version 120\n"  // OpenGL 2.1
-#endif
-    "attribute vec2 coord2d;                  "
-    "void main(void) {                        "
-    "  gl_Position = vec4(coord2d, 0.0, 1.0); "
-    "}";
-  glShaderSource(vs, 1, &vs_source, NULL);
+  std::string file_;
+  file_.assign(dir);
+  {
+    std::string file_str(file_);
+    file_str.append("triangles.vert");
+    DEBUG(file_str);
+    std::string vs_source(open_gl_version.begin(), open_gl_version.end());
+    read_file(file_str.c_str(), vs_source);
+    DEBUG(vs_source);
+    const char * c_source = vs_source.c_str();
+    glShaderSource(vs, 1, &c_source, NULL);
+  }
   glCompileShader(vs);
   glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
   if (0 == compile_ok)
@@ -70,16 +97,17 @@ int init(void)
     std::cerr << "Error in vertex shader\n";
     return (0);
   }
-
   GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-  const char *fs_source =
-    "#version 120           \n"
-    "void main(void) {        "
-    "  gl_FragColor[0] = 0.0; "
-    "  gl_FragColor[1] = 0.0; "
-    "  gl_FragColor[2] = 1.0; "
-    "}";
-  glShaderSource(fs, 1, &fs_source, NULL);
+  {
+    std::string file_str(file_);
+    file_str.append("triangles.frag");
+    DEBUG(file_str);
+    std::string fs_source;
+    read_file(file_str.c_str(), fs_source);
+    DEBUG(fs_source);
+    const char * c_source = fs_source.c_str();
+    glShaderSource(fs, 1, &c_source, NULL);
+  }
   glCompileShader(fs);
   glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
   if (!compile_ok)

@@ -1,8 +1,6 @@
-#version 210 core
-
-layout(location = 0) in vec4 vPosition;
-
-void main()
+attribute vec2 coord2d;
+    
+void main(void) 
 {
-    gl_position = vPosition;
+	gl_Position = vec4(coord2d, 0.0, 1.0);
 }

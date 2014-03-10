@@ -27,6 +27,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.696344840" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.2022189130" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Nightmare/oglpg-8th-edition/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Nightmare/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1923208877" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -85,6 +86,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1554463978" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Nightmare/oglpg-8th-edition/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/home/claudiordgz/workspace/Nightmare/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Nightmare/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.407102599" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -147,4 +149,5 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
