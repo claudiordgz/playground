@@ -11,15 +11,13 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-
   glutInitWindowPosition(10, 10);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA );
   glutInitWindowSize(512, 512);
   glutInitContextVersion(2, 1);
   glutInitContextProfile(GLUT_CORE_PROFILE);
   glewExperimental = GL_TRUE;
-  std::string testing = "testing";
-  glutCreateWindow(testing.c_str());
+  glutCreateWindow("testing");
 
   GLenum glew_status = glewInit();
   if(glew_status != GLEW_OK)
@@ -29,16 +27,13 @@ int main(int argc, char **argv)
   }
   std::cout << glGetString( GL_VERSION ) << std::endl;
 
-  if(1 == init(argv[argc-1]))
-  {
-    /* We can display it if everything goes OK */
-    glutDisplayFunc(display);
-    glutMainLoop();
-  }
-
-  /* If the program exits in the usual way,
-  free resources and exit with a success */
-  free_resources();
+  /*
+   * The entry point for our
+   * OpenGL implementation
+   * currently supports only one Draw
+   */
+  OpenGLProgram program(argv[argc-1]);
+  program.run();
 
   return (EXIT_SUCCESS);
 }

@@ -17,42 +17,24 @@
  */
 #include "file_operations.hpp"
 
-GLuint program;
-GLint attribute_coord2d;
-
-#ifdef GL_ES_VERSION_2_0
-  const std::string open_gl_version = "#version 100\n";  // OpenGL ES 2.0
+#define debugging_enabled true
+#if 0
+#define DEBUG__
+#endif
+#ifdef DEBUG__
+#define DEBUG(x)  do { \
+  if (debugging_enabled) { std::cerr << x << std::endl; } \
+} while (0)
 #else
-  const std::string open_gl_version = "#version 120\n";  // OpenGL 2.1
+#define DEBUG(x)
 #endif
 
 
-#define debugging_enabled true
-#define DEBUG(x) do { \
-  if (debugging_enabled) { std::cerr << x << std::endl; } \
-} while (0)
-
-void get_shader(char *dir, const char *file_name,
-                std::string const& open_gl_ver, std::string &returnVal)
-{
-  std::string file_str(dir);
-  file_str.append(file_name);
-  DEBUG(file_str);
-  returnVal.assign(open_gl_ver.begin(), open_gl_ver.end());
-  read_file(file_str.c_str(), returnVal);
-  DEBUG(returnVal);
-}
-
-int init(char *dir)
+int OpenGLProgram::Init()
 {
   GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
   GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-  {
-    std::string vs_source;
-    get_shader(dir, "triangles.vert", open_gl_version, vs_source);
-    const char * c_source = vs_source.c_str();
-    glShaderSource(vs, 1, &c_source, NULL);
-  }
+  SetShader(vs, "triangles.vert");
   glCompileShader(vs);
   glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
   if (0 == compile_ok)
@@ -61,12 +43,7 @@ int init(char *dir)
     return (0);
   }
   GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-  {
-    std::string fs_source;
-    get_shader(dir, "triangles.frag", open_gl_version, fs_source);
-    const char * c_source = fs_source.c_str();
-    glShaderSource(fs, 1, &c_source, NULL);
-  }
+  SetShader(fs, "triangles.frag");
   glCompileShader(fs);
   glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
   if (!compile_ok)
@@ -74,11 +51,11 @@ int init(char *dir)
     std::cerr << "Error in fragment shader\n";
     return (0);
   }
-  program = glCreateProgram();
-  glAttachShader(program, vs);
-  glAttachShader(program, fs);
-  glLinkProgram(program);
-  glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
+  this->program = glCreateProgram();
+  glAttachShader(this->program, vs);
+  glAttachShader(this->program, fs);
+  glLinkProgram(this->program);
+  glGetProgramiv(this->program, GL_LINK_STATUS, &link_ok);
   if (!link_ok)
   {
     std::cerr << "glLinkProgram:";
@@ -86,8 +63,8 @@ int init(char *dir)
   }
 
   const char* attribute_name = "coord2d";
-  attribute_coord2d = glGetAttribLocation(program, attribute_name);
-  if (attribute_coord2d == -1)
+  this->attribute_coord2d = glGetAttribLocation(this->program, attribute_name);
+  if (this->attribute_coord2d == -1)
   {
     std::cerr << "Could not bind attribute " << attribute_name << std::endl;
     return (0);
@@ -97,14 +74,14 @@ int init(char *dir)
 }
 
 
-void display(void)
+void OpenGLProgram::_Display(void)
 {
   /* Clear the background as white */
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glUseProgram(program);
-  glEnableVertexAttribArray(attribute_coord2d);
+  glUseProgram(this->program);
+  glEnableVertexAttribArray(this->attribute_coord2d);
   GLfloat triangle_vertices[] = {
      0.0,  0.8,
     -0.8, -0.8,
@@ -112,7 +89,7 @@ void display(void)
   };
   /* Describe our vertices array to OpenGL (it can't guess its format automatically) */
   glVertexAttribPointer(
-    attribute_coord2d, // attribute
+    this->attribute_coord2d, // attribute
     2,                 // number of elements per vertex, here (x,y)
     GL_FLOAT,          // the type of each element
     GL_FALSE,          // take our values as-is
@@ -122,16 +99,59 @@ void display(void)
 
   /* Push each element in buffer_vertices to the vertex shader */
   glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDisableVertexAttribArray(attribute_coord2d);
+  glDisableVertexAttribArray(this->attribute_coord2d);
 
   /* Display the result */
   glutSwapBuffers();
 }
 
-void free_resources()
+void OpenGLProgram::SetShader(GLuint &shader, const char *filename)
 {
-  glDeleteProgram(program);
+  std::string s_source;
+  GetShader(filename, s_source);
+  const char * c_source = s_source.c_str();
+  glShaderSource(shader, 1, &c_source, NULL);
 }
 
+void OpenGLProgram::GetShader(const char *file_name, std::string &returnVal)
+{
+  std::string file_str(this->dir_);
+  file_str.append(file_name);
+  DEBUG(file_str);
+  returnVal.assign(this->open_gl_version.begin(), this->open_gl_version.end());
+  read_file(file_str.c_str(), returnVal);
+  DEBUG(returnVal);
+}
 
+void OpenGLProgram::FreeResources()
+{
+  glDeleteProgram(this->program);
+}
 
+void OpenGLProgram::run(void)
+{
+  if(1 == Init())
+  {
+    /* We can display it if everything goes OK */
+    SetupDisplayCallback();
+    glutMainLoop();
+  }
+
+  /* If the program exits in the usual way,
+  free resources and exit with a success */
+  FreeResources();
+}
+
+OpenGLProgram* g_CurrentInstance;
+
+extern "C"
+void drawCallback()
+{
+  g_CurrentInstance->_Display();
+}
+
+void OpenGLProgram::SetupDisplayCallback()
+{
+  ::g_CurrentInstance = this;
+  ::glutDisplayFunc(::drawCallback);
+}
