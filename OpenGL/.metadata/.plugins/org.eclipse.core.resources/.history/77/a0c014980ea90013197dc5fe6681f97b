@@ -1,0 +1,29 @@
+#ifndef NIGHTMARE_FILE_OPERATIONS_HPP
+#define NIGHTMARE_FILE_OPERATIONS_HPP
+
+// $Id$
+/**
+ * @file file_operations.hpp
+ * File Input Output Operations are placed here
+ * @brief We need to read frag a vert files (GLSL)
+ *
+ * @author Claudiordgz
+ */
+// $Log$
+
+/**
+   Read file just punches a file into a string
+
+   @param[in]     filename The input file (vert or frag in our case).
+   @param[in,out] content The string we are returning.
+ */
+template<class T>
+void read_file(T const &filename, std::string &content)
+{
+  std::ifstream ifs(filename);
+  content.append((std::istreambuf_iterator<char>(ifs)),
+                 (std::istreambuf_iterator<char>()));
+  ifs.close();
+}
+
+#endif

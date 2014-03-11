@@ -1,0 +1,87 @@
+/*
+ * opengl_methods.hpp
+ *
+ *  Created on: Mar 10, 2014
+ *      Author: claudiordgz
+ */
+
+#ifndef OPENGL_METHODS_HPP_
+#define OPENGL_METHODS_HPP_
+// $Id$
+/**
+ * @file file_operations.hpp
+ * File Input Output Operations are placed here
+ * @brief We need to read frag a vert files (GLSL)
+ *
+ * @author Claudiordgz
+ */
+// $Log$
+
+#include "vgl.h"
+#include <GL/glew.h>
+
+#include <string>
+#include <iostream>
+
+
+/**
+ * @class OpenGLProgram
+ *
+ * @brief The class that contains the our OpenGL logic
+ */
+class OpenGLProgram
+{
+public:
+  /**
+   * Constructor
+   * @param dir The path to our media files (Frag and Vert)
+   */
+  OpenGLProgram(char *dir): dir_(dir),
+			    program(0),
+			    attribute_coord2d(0)
+  {
+  }
+  /**
+   * Main loop of execution
+   */
+  void run(void);
+
+  /**
+   * This function gets passed to
+   * a callback
+   */
+  void _Display(void);
+
+private:
+  int Init(void);
+  void FreeResources(void);
+
+  /**
+   * SetShader acquires the file descriptor for a shader
+   * using the GetShader method
+   * @param[in]     filename The input file (vert or frag in our case).
+   * @param[in,out] shader a GLuint to receive the file descriptor to the shader.
+   */
+  void SetShader(GLuint &shader, const char *filename);
+
+  /*
+   * @param[in]
+   * @param[in]     filename The input file (vert or frag in our case).
+   * @param[in,out] content The string we are returning.
+   */
+  void GetShader(const char *file_name,
+                  std::string const& open_gl_ver, std::string &returnVal);
+  void SetupDisplayCallback();
+
+#ifdef GL_ES_VERSION_2_0
+  const std::string open_gl_version = "#version 100\n";  // OpenGL ES 2.0
+#else
+  const std::string open_gl_version = "#version 120\n";  // OpenGL 2.1
+#endif
+  char *dir_;
+  GLuint program;
+  GLint attribute_coord2d;
+};
+
+
+#endif /* OPENGL_METHODS_HPP_ */

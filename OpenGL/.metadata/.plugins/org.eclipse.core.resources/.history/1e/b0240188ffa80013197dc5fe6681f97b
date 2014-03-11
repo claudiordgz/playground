@@ -1,0 +1,47 @@
+/*
+ * opengl_methods.hpp
+ *
+ *  Created on: Mar 10, 2014
+ *      Author: claudiordgz
+ */
+
+#ifndef OPENGL_METHODS_HPP_
+#define OPENGL_METHODS_HPP_
+
+#include "vgl.h"
+#include <GL/glew.h>
+
+#include <string>
+#include <iostream>
+
+class OpenGLProgram
+{
+public:
+  OpenGLProgram(char *dir): dir_(dir),
+			    program(0),
+			    attribute_coord2d(0)
+  {
+  }
+  int Init(void);
+  void Display(void);
+  void FreeResources(void);
+
+
+private:
+  void SetShader(GLuint &shader, const char *filename);
+  void GetShader(char *dir, const char *file_name,
+                  std::string const& open_gl_ver, std::string &returnVal);
+
+#ifdef GL_ES_VERSION_2_0
+  const std::string open_gl_version = "#version 100\n";  // OpenGL ES 2.0
+#else
+  const std::string open_gl_version = "#version 120\n";  // OpenGL 2.1
+#endif
+  char *dir_;
+  GLuint program;
+  GLint attribute_coord2d;
+};
+void (OpenGLProgram::*display__)(void) const = 0;
+display__ = &OpenGLProgram::Display;
+
+#endif /* OPENGL_METHODS_HPP_ */
