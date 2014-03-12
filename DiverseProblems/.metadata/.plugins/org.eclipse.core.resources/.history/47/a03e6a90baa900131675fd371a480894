@@ -1,0 +1,25 @@
+//============================================================================
+// Name        : DevilsPredicament.cpp
+// Author      : 
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <unordered_map>
+#include <stdint.h>
+using namespace std;
+
+enum class Unflavored : uint8_t { cereal, pasta, lasagna, tortillas, batter, pita, END_OF_LIST };
+enum class Salty { crackers, corn_chips, poutines, tacos, french_friend, END_OF_LIST };
+enum class Sugary { doughnuts, pastries, cake, cupcakes, cookies, tarts, pies, END_OF_LIST };
+enum class Sweet { waffles, pancakes, pikelets, pudding, souffles, fritters, muffins, END_OF_LIST };
+
+
+int main() {
+	int i = 5;
+	auto e = i;
+	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	return 0;
+}

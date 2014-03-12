@@ -1,0 +1,8 @@
+food:
+
+Unflavored : uint8_t { cereal, pasta, lasagna, tortillas, batter, pita, END_OF_LIST };
+Salty : uint8_t { crackers, corn_chips, poutines, tacos, french_friend, END_OF_LIST };
+Sugary : uint8_t { doughnuts, pastries, cake, cupcakes, cookies, tarts, pies, END_OF_LIST };
+Sweet : uint8_t { waffles, pancakes, pikelets, pudding, souffles, fritters, muffins, END_OF_LIST };
+FluffyUnflavored : uint8_t { pannini, wraps, croissants, bagels, pretzels, bread, END_OF_LIST };
+WtfHumansThisIsGood : uint8_t { dumplings, noodles, END_OF_LIST };

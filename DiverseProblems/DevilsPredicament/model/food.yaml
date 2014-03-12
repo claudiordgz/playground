@@ -1,0 +1,51 @@
+gram: &uw001 grams 
+tablespoon: &uw002 tablespoons
+cup: &uw003 cups
+calories: &ue001 calories
+units:
+  weight:
+    - *uw001
+    - *uw002
+    - *uw003
+  energy:
+    - *ue001
+food:
+  - Unflavored: 
+    - cereal: [320, *ue001, 100, *uw001]
+    - pasta: [372, *ue001, 100, *uw001]
+    - lasagna: [135, *ue001, 100, *uw001]
+    - tortillas: [240, *ue001, 100, *uw001]
+    - batter: [43, *ue001, 1, *uw002]
+    - pita: [275, *ue001, 100, *uw001]
+  - Salty: 
+    - crackers: [95, *ue001, 100, *uw001]
+    - corn_chips: [156, *ue001, 1, *uw003]
+    - poutines: [510, *ue001, 210, *uw001]
+    - tacos: [226, *ue001, 100, *uw001]
+    - french_fries: [312, *ue001, 100, *uw001]
+  - Sugary: 
+    - doughnuts: [452, *ue001, 100, *uw001]
+    - pastries: [374, *ue001, 100, *uw001]
+    - cake: [72, *ue001, 28, *uw001]
+    - cupcakes: [305, *ue001, 100, *uw001]
+    - cookies: [467, *ue001, 100, *uw001]
+    - tarts: [430, *ue001, 90, *uw001]
+    - pies: [237, *ue001, 100, *uw001]
+  - Sweet:
+    - waffles: [291, *ue001, 100, *uw001]
+    - pancakes: [227, *ue001, 100, *uw001]
+    - pikelets: [454, *ue001, 200, *uw001]
+    - pudding: [120, *ue001, 100, *uw001]
+    - souffles: [56, *ue001, 28, *uw001]
+    - fritters: [420, *ue001, 124, *uw001]
+    - muffins: [377, *ue001, 100, *uw001]
+  - FluffyUnflavored:
+    - panini: [210, *ue001, 75, *uw001]
+    - wraps: [170, *ue001, 63, *uw001]
+    - croissants: [406, *ue001, 100, *uw001]
+    - bagels: [250, *ue001, 100, *uw001]
+    - pretzels: [380, *ue001, 100, *uw001]
+    - bread: [290, *ue001, 100, *uw001]
+  - WtfHumansThisIsGood:
+    - dumplings: [100, *ue001, 1, *uw003]
+    - noodles: [140, *ue001, 100, *uw001]
