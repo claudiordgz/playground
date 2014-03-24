@@ -62,8 +62,8 @@ int OpenGLProgram::Init()
     return (0);
   }
 
-  const char* attribute_name = "coord2d";
-  this->attribute_coord2d = glGetAttribLocation(this->program, attribute_name);
+  std::string attribute_name = "coord2d";
+  this->attribute_coord2d = glGetAttribLocation(this->program, attribute_name.c_str());
   if (this->attribute_coord2d == -1)
   {
     std::cerr << "Could not bind attribute " << attribute_name << std::endl;
@@ -83,14 +83,14 @@ void OpenGLProgram::_Display(void)
   glUseProgram(this->program);
   glEnableVertexAttribArray(this->attribute_coord2d);
   GLfloat triangle_vertices[] = {
-     0.0,  0.8,
-    -0.8, -0.8,
-     0.8, -0.8,
+     -0.8f, -0.8f, 0.0f,
+      0.8f, -0.8f, 0.0f,
+      0.0f,  0.8f, 0.0f,
   };
   /* Describe our vertices array to OpenGL (it can't guess its format automatically) */
   glVertexAttribPointer(
     this->attribute_coord2d, // attribute
-    2,                 // number of elements per vertex, here (x,y)
+    3,                 // number of elements per vertex, here (x,y)
     GL_FLOAT,          // the type of each element
     GL_FALSE,          // take our values as-is
     0,                 // no extra data between each position

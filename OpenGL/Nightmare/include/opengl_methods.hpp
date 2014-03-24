@@ -81,7 +81,7 @@ private:
 #else
   const std::string open_gl_version = "#version 120\n";  ///< OpenGL 2.1
 #endif
-  char *dir_;			///< a pointer to the media directory in your drive (GLSL)
+  std::string dir_;			///< a pointer to the media directory in your drive (GLSL)
   GLuint program;		///< the program descriptor
   GLint attribute_coord2d;	///< the attribute coordinates descriptor
 };
